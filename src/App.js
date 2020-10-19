@@ -1,25 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useEffect, useState } from 'react';
+import { Container, Grid } from '@material-ui/core';
+import Tracker from './components/Tracker/Tracker';
+import CountryTracker from './components/CountryTracker/CountryTracker';
+import Loader from 'react-loader';
 function App() {
+  const [globalData, setGlobalData] = useState({});
+  const [countries, setCountries] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoaded(false);
+      const res = await fetch(`${process.env.REACT_APP_API}/summary`);
+      const { Global, Countries } = await res.json();
+      setGlobalData(Global);
+      setCountries(Countries);
+      setIsLoaded(true);
+    }
+
+    fetchData();
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container className="App">
+      <Grid container justify="center">
+        <img src={require("../src/covid.png")} alt="covid header" className="header-img" align="center" style={{ marginTop: "20px" }} />
+      </Grid>
+      <Tracker confirmed={globalData.TotalConfirmed} recovered={globalData.TotalRecovered} deaths={globalData.TotalDeaths} title="Global Stats" />
+      <Loader loaded={isLoaded}>
+        <CountryTracker countries={countries} />
+      </Loader>
+    </Container>
   );
 }
 
