@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
 import Tracker from '../Tracker/Tracker';
 import { Line } from 'react-chartjs-2';
+import * as zoom from 'chartjs-plugin-zoom';
 
 function CountryTracker(props) {
     const [country, setCountry] = useState({});
@@ -103,7 +104,21 @@ function CountryTracker(props) {
         }
 
         loadInitialCountry();
+
     }, [props.countries])
+
+    const zoomOptions = {
+        zoom: {
+            enabled: true,
+            mode: 'x',
+            speed: 100000000000
+        },
+        pan: {
+            enabled: true,
+            mode: 'x',
+            speed: 10
+        }
+    }
     return (
         <div>
             <FormControl fullWidth>
@@ -115,7 +130,7 @@ function CountryTracker(props) {
 
             {Object.keys(country).length ? <Tracker confirmed={country.TotalConfirmed} recovered={country.TotalRecovered} deaths={country.TotalDeaths} title={country.Country} /> : null}
 
-            {Object.keys(covidData).length ? <Line data={covidData ?? []} className="covid-chart" /> : null}
+            {Object.keys(covidData).length ? <Line data={covidData ?? []} options={zoomOptions} className="covid-chart" /> : null}
         </div>
     );
 }
